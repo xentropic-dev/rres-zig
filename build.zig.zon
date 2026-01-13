@@ -1,0 +1,17 @@
+.{
+    .name = .zig_rres,
+    .version = "0.0.0",
+    .fingerprint = 0xaeeb57b2ead00865,
+    .minimum_zig_version = "0.15.2",
+    .dependencies = .{
+        .upstream = .{
+            .url = "git+https://github.com/raysan5/rres#205de35c0f9a20fe464dd062d7a63934c3eedaa4",
+            .hash = "N-V-__8AAIP-AwHs-WXWVcJmcg158WHD4QxNc7qnnHztCI03",
+        },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}
