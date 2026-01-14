@@ -1,9 +1,16 @@
 //! Zig bindings for rres (raylib resource format)
 const std = @import("std");
+const build_options = @import("build_options");
 
-const c = @cImport({
+const c = if (build_options.enable_raylib) @cImport({
+    @cInclude("raylib.h");
+    @cInclude("rres.h");
+    @cInclude("rres-raylib.h");
+}) else @cImport({
     @cInclude("rres.h");
 });
+
+pub const rres_raylib = if (build_options.enable_raylib) c else void;
 
 // Types
 pub const rresFileHeader = c.rresFileHeader;

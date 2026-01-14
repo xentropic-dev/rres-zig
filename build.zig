@@ -4,48 +4,55 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
+    const enable_raylib = b.option(bool, "raylib", "Enable raylib integration") orelse false;
+
     const upstream = b.dependency("upstream", .{});
 
-    const lib = b.addLibrary(.{
-        .name = "rres-zig",
-        .root_module = b.createModule(.{
-            .target = target,
-            .optimize = optimize,
-            .link_libc = true,
-            .root_source_file = b.path("src/root.zig"),
-        }),
-    });
+    const options = b.addOptions();
+    options.addOption(bool, "enable_raylib", enable_raylib);
 
-    lib.addIncludePath(upstream.path("src"));
-    lib.addIncludePath(b.path("src"));
-    lib.root_module.addCSourceFiles(.{
-        .root = upstream.path("src/external"),
-        .files = &.{ "aes.c", "lz4.c", "monocypher.c" },
-        .flags = &.{},
-    });
-    lib.root_module.addCSourceFile(.{
-        .file = b.path("src/rres_impl.c"),
-        .flags = &.{},
-    });
-
-    // Example executable
-    const exe = b.addExecutable(.{ .name = "example", .root_module = b.createModule(.{
-        .root_source_file = b.path("example/main.zig"),
+    const rres_module = b.addModule("rres", .{
+        .root_source_file = b.path("src/root.zig"),
         .target = target,
         .optimize = optimize,
-    }) });
+        .link_libc = true,
+    });
 
-    exe.root_module.addImport("rres", lib.root_module);
+    rres_module.addImport("build_options", options.createModule());
 
-    b.installArtifact(exe);
+    rres_module.addIncludePath(upstream.path("src"));
+    rres_module.addIncludePath(b.path("src"));
 
-    const run_cmd = b.addRunArtifact(exe);
-    run_cmd.step.dependOn(b.getInstallStep());
+    // Note: external libraries (aes, lz4, monocypher) are included by the implementation headers
+    // so we don't compile them separately to avoid duplicate symbols
 
-    if (b.args) |args| {
-        run_cmd.addArgs(args);
+    rres_module.addCSourceFile(.{
+        .file = b.path("src/rres_impl.c"),
+        .flags = &.{
+            "-DRRES_SUPPORT_COMPRESSION_LZ4",
+            "-DRRES_SUPPORT_ENCRYPTION_AES",
+            "-DRRES_SUPPORT_ENCRYPTION_XCHACHA20",
+        },
+    });
+
+    if (enable_raylib) {
+        const raylib_dep = b.dependency("raylib_zig", .{
+            .target = target,
+            .optimize = optimize,
+        });
+        const raylib_module = raylib_dep.module("raylib");
+        const raylib_artifact = raylib_dep.artifact("raylib");
+
+        rres_module.addImport("raylib", raylib_module);
+        rres_module.linkLibrary(raylib_artifact);
+
+        rres_module.addCSourceFile(.{
+            .file = b.path("src/rres_raylib_impl.c"),
+            .flags = &.{
+                "-DRRES_SUPPORT_COMPRESSION_LZ4",
+                "-DRRES_SUPPORT_ENCRYPTION_AES",
+                "-DRRES_SUPPORT_ENCRYPTION_XCHACHA20",
+            },
+        });
     }
-
-    const run_step = b.step("run", "Run the example");
-    run_step.dependOn(&run_cmd.step);
 }
