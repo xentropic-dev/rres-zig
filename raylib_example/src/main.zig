@@ -10,54 +10,42 @@ pub fn main() anyerror!void {
     const screenWidth = 800;
     const screenHeight = 450;
 
-    // Set password FIRST, before initializing raylib
-    // rres.rresSetCipherPassword("a");
-
     rl.initWindow(screenWidth, screenHeight, "raylib-zig [core] example - basic window");
+    defer rl.closeWindow();
 
-    // Verify password was set
-    const set_password = rres.rresGetCipherPassword();
-    std.debug.print("Password set to: {s}\n", .{set_password});
-
+    // Load rres central directory
     const rres_dir = rres.rresLoadCentralDirectory("resources/example.rres");
     defer rres.rresUnloadCentralDirectory(rres_dir);
 
+    // Get resource ID for "zero.png"
     const id_signed = rres.rresGetResourceId(rres_dir, "zero.png");
     const id: c_uint = @bitCast(id_signed);
 
-    var chunk = rres.rresLoadResourceChunk("resources/example_chacha2.rres", id);
+    // Load and unpack resource chunk
+    var chunk = rres.rresLoadResourceChunk("resources/example.rres", id);
     defer rres.rresUnloadResourceChunk(chunk);
 
-    std.debug.print("Chunk cipher type: {d}, compression type: {d}\n", .{ chunk.info.cipherType, chunk.info.compType });
-
     const unpack_result = rres.rres_raylib.UnpackResourceChunk(&chunk);
-
     if (unpack_result != 0) {
-        std.debug.print("ERROR: Failed to unpack (result: {d}). Please create an unencrypted rres file for testing.\n", .{unpack_result});
+        std.debug.print("ERROR: Failed to unpack resource (error code: {d})\n", .{unpack_result});
         return error.UnpackFailed;
     }
 
+    // Load image from unpacked resource
     const image_c = rres.rres_raylib.LoadImageFromResource(chunk);
     const image: rl.Image = @bitCast(image_c);
     const texture = rl.loadTextureFromImage(image) catch |err| {
-        std.debug.print("Failed to load texture: {}\n", .{err});
+        std.debug.print("ERROR: Failed to load texture: {}\n", .{err});
         return err;
     };
     defer rl.unloadTexture(texture);
     rl.unloadImage(image);
 
-    defer rl.closeWindow(); // Close window and OpenGL context
-
-    rl.setTargetFPS(60); // Set our game to run at 60 frames-per-second
+    rl.setTargetFPS(60);
     //--------------------------------------------------------------------------------------
 
     // Main game loop
-    while (!rl.windowShouldClose()) { // Detect window close button or ESC key
-        // Update
-        //----------------------------------------------------------------------------------
-        // TODO: Update your variables here
-        //----------------------------------------------------------------------------------
-
+    while (!rl.windowShouldClose()) {
         // Draw
         //----------------------------------------------------------------------------------
         rl.beginDrawing();
