@@ -25,6 +25,23 @@ pub fn main() anyerror!void {
     var chunk = rres.rresLoadResourceChunk("resources/example.rres", id);
     defer rres.rresUnloadResourceChunk(chunk);
 
+    // Demonstrate enum usage - inspect resource properties
+    std.debug.print("\n=== Resource Information ===\n", .{});
+    std.debug.print("Resource ID: {d}\n", .{id});
+    std.debug.print("Resource Name: zero.png\n", .{});
+
+    // Get data type using the helper function (pass the FourCC type field)
+    const data_type_raw = rres.rresGetDataType(&chunk.info.type);
+    const data_type = rres.ResourceDataType.fromCInt(data_type_raw);
+    std.debug.print("Data Type: {s}\n", .{@tagName(data_type)});
+
+    const compression = rres.getCompressionType(chunk.info);
+    std.debug.print("Compression: {s}\n", .{@tagName(compression)});
+
+    const encryption = rres.getEncryptionType(chunk.info);
+    std.debug.print("Encryption: {s}\n", .{@tagName(encryption)});
+    std.debug.print("============================\n\n", .{});
+
     const unpack_result = rres.rres_raylib.UnpackResourceChunk(&chunk);
     if (unpack_result != 0) {
         std.debug.print("ERROR: Failed to unpack resource (error code: {d})\n", .{unpack_result});
