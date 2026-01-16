@@ -4,13 +4,13 @@
     .fingerprint = 0xaeeb57b2ead00865,
     .minimum_zig_version = "0.15.2",
     .dependencies = .{
-        .upstream = .{
-            .url = "git+https://github.com/raysan5/rres#e4c79fb86e60ea1c464fb6dd0c0bb12f98d7fedc",
-            .hash = "",
-        },
         .raylib_zig = .{
             .url = "git+https://github.com/raylib-zig/raylib-zig?ref=devel#7d4761b878f43671024ce197f721827b5355a67e",
             .hash = "raylib_zig-5.6.0-dev-KE8REGlNBQDR7NML06VBtT7gP3VZNY70E5WohAxzqrNn",
+        },
+        .upstream = .{
+            .url = "git+https://github.com/raysan5/rres.git#b48c4a4519fead10c114d0694f72402790fd9687",
+            .hash = "N-V-__8AAJ7-AwFNyZdqQ_i8HZJM5IRgW6h-41Wemx2GeXwG",
         },
     },
     .paths = .{

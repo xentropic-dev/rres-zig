@@ -11,7 +11,7 @@ pub fn main() anyerror!void {
     const screenHeight = 450;
 
     // Set password FIRST, before initializing raylib
-    rres.rresSetCipherPassword("a");
+    // rres.rresSetCipherPassword("a");
 
     rl.initWindow(screenWidth, screenHeight, "raylib-zig [core] example - basic window");
 
@@ -19,7 +19,7 @@ pub fn main() anyerror!void {
     const set_password = rres.rresGetCipherPassword();
     std.debug.print("Password set to: {s}\n", .{set_password});
 
-    const rres_dir = rres.rresLoadCentralDirectory("resources/example_chacha2.rres");
+    const rres_dir = rres.rresLoadCentralDirectory("resources/example.rres");
     defer rres.rresUnloadCentralDirectory(rres_dir);
 
     const id_signed = rres.rresGetResourceId(rres_dir, "zero.png");
