@@ -23,6 +23,12 @@ pub fn build(b: *std.Build) void {
     rres_module.addIncludePath(upstream.path("src"));
     rres_module.addIncludePath(b.path("src"));
 
+    // Add emscripten sysroot for wasm builds
+    if (target.result.os.tag == .emscripten) {
+        const emsdk_dep = b.dependency("emsdk", .{});
+        rres_module.addSystemIncludePath(emsdk_dep.path("upstream/emscripten/cache/sysroot/include"));
+    }
+
     // Note: external libraries (aes, lz4, monocypher) are included by the implementation headers
     // so we don't compile them separately to avoid duplicate symbols
 
