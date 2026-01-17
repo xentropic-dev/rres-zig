@@ -8,6 +8,10 @@
             .url = "git+https://github.com/raylib-zig/raylib-zig?ref=devel#7d4761b878f43671024ce197f721827b5355a67e",
             .hash = "raylib_zig-5.6.0-dev-KE8REGlNBQDR7NML06VBtT7gP3VZNY70E5WohAxzqrNn",
         },
+        .emsdk = .{
+            .url = "git+https://github.com/emscripten-core/emsdk?ref=4.0.9#3bcf1dcd01f040f370e10fe673a092d9ed79ebb5",
+            .hash = "N-V-__8AAJl1DwBezhYo_VE6f53mPVm00R-Fk28NPW7P14EQ",
+        },
         .upstream = .{
             .url = "git+https://github.com/raysan5/rres.git#b48c4a4519fead10c114d0694f72402790fd9687",
             .hash = "N-V-__8AAJ7-AwFNyZdqQ_i8HZJM5IRgW6h-41Wemx2GeXwG",
